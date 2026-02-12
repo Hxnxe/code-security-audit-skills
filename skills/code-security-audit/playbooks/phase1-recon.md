@@ -365,3 +365,20 @@ When ALL Phase 1 steps are done, output a **Phase 1 Summary** (max 20 lines):
 ```
 
 Then proceed to Phase 2. All detailed data is in audit/ files — do NOT carry Phase 1 conversation details forward mentally.
+
+---
+
+## Attack Hypothesis Framework (Phase 1 Output)
+
+Generate 3–5 attack hypotheses in `audit/hypotheses.md`.
+
+Rules:
+1. Must be grounded in map.json entries only.
+2. Each includes: Claim, Evidence (map/triage refs), Missing links, Status.
+3. Missing links drive Phase 2 priority search.
+
+Output fields:
+- Claim
+- Evidence
+- Missing links
+- Status: open/supported/refuted
