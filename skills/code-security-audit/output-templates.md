@@ -157,6 +157,18 @@ Each finding follows this exact template:
 - **Remediation**: Add `@admin_required` decorator
 ```
 
+## Structured Finding Template (Required)
+
+```
+## [Type] SQL Injection
+- File: `path/to/file:line`
+- Entry: `source`
+- Sink: `sink`
+- Dataflow: `source` → `transform` → `sink`
+- Verification: <evidence>
+- Severity: Critical
+```
+
 ## 5. report.md (Phase 4)
 
 **默认规范（强制）：**
