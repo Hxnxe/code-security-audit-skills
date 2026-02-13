@@ -64,7 +64,7 @@ Invoke these Droid subagents via the Task tool during Phase 3:
 - **`poc-generator`** Droid — Generate PoC for CONFIRMED findings → embedded in `audit/findings.md`
 
 **Step 3 — Consolidation (CRITICAL: runs last, sees everything)**:
-- **`security-analyst`** Droid — Reads ALL Phase 3 outputs + map.json. Performs:
+- **`security-analyst`** Droid (`mode=phase3_final`) — Reads ALL Phase 3 outputs + map.json. Performs:
   - Cross-finding correlation and deduplication
   - Attack chain construction (combining 2+ vulns)
   - Severity recalibration with full context

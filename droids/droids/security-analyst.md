@@ -85,7 +85,7 @@ Individual Droids rate severity in isolation. You recalibrate with full context:
 - A "Low" info leak becomes "High" if it's step 1 of a critical attack chain
 
 ### Coverage Gap Identification
-Review the D1-D10 coverage matrix. Flag any dimension that Phase 3 Droids failed to deep-verify despite Phase 2 flagging issues.
+Review the D1-D12 coverage matrix. Flag any dimension that Phase 3 Droids failed to deep-verify despite Phase 2 flagging issues.
 
 ## Output
 

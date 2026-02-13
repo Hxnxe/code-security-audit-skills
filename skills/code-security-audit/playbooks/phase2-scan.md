@@ -23,6 +23,7 @@ Before executing Phase 2, verify these artifacts exist:
 
 Initialization rule:
 - Ensure `audit/prereq-candidates.md` exists at Phase 2 start (create an empty file with header if missing), so downstream gates are deterministic even when no P0/P1 is found.
+- Ensure `audit/attack-chains-draft.md` exists at Phase 2 start (create an empty file with header if missing), so Phase 3 gate checks are deterministic.
 
 ---
 
@@ -183,7 +184,7 @@ Combine Step 0 findings + Step 0.5 reviewed ALERTs into `audit/risk-map.md` — 
 
 ## Step 3.5: Draft Attack Chain Synthesis (Phase 2)
 
-Invoke `security-analyst` once at the end of Phase 2 to produce draft chains for Phase 3 prioritization.
+Invoke `security-analyst` once at the end of Phase 2 with `mode=phase2_draft` to produce draft chains for Phase 3 prioritization.
 
 **Input set (Phase 2 draft mode)**:
 - `audit/map.json`
