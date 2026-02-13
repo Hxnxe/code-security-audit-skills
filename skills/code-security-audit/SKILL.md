@@ -23,8 +23,8 @@ tags: [security, audit, dataflow, coverage, webapp]
 | Phase | Playbook | Outputs | Gate |
 |------|----------|---------|------|
 | 1 | `playbooks/phase1-recon.md` | map.json, triage.md, hypotheses.md, read-log.md, business-model.md | All exist + non-empty |
-| 2 | `playbooks/phase2-scan.md` | public-endpoint-review.md, risk-map.md | Both exist |
-| 2.5 | `playbooks/phase2.5-check.md` | coverage table + convergence | D1/D2/D3 + E1/E2/E4/E5 must be ✅ |
+| 2 | `playbooks/phase2-scan.md` | public-endpoint-review.md, risk-map.md, prereq-candidates.md, attack-chains-draft.md | All required outputs exist |
+| 2.5 | `playbooks/phase2.5-check.md` | coverage table + convergence | D1/D2/D3/D11/D12 + E1/E2/E4/E5/E6 must be ✅ |
 | 3 | `playbooks/phase3-verify.md` | findings.md, dataflow.md, findings-consolidated.md | risk-map exists + gate passed |
 | 4 | `output-templates.md` | report.md | report generated |
 

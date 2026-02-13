@@ -45,20 +45,22 @@ These checks use `audit/read-log.md` as the canonical evidence source. Self-repo
 
 | ID | Check | Verification Method | Status |
 |----|-------|---------------------|--------|
-| E1 | All public endpoints covered | Count (deep-read + shallow-read + shallow-clear) entries in read-log where auth=public == count in map.json#public_endpoints. Priority 3 "shallow-clear" entries count as covered only if triage F/G scans ran successfully. | |
+| E1 | All public endpoints covered | Compute `public_covered/public_total` where `public_total` comes from `map.json#public_endpoints` and `public_covered` from read-log (deep-read + shallow-read + shallow-clear). Pass threshold: `>= 0.95`. Priority 3 "shallow-clear" entries count as covered only if triage F/G scans ran successfully. | |
 | E2 | All auth endpoints Read | Glob auth-related files vs read-log entries where purpose=entry and file matches auth glob patterns | |
 | E3 | ORM escape hatches searched | If ast-grep available: run structural search. Fallback: rg ".(literal\|raw\|extra\|text\|unsafe)\(". All dangerous matches must appear in map.json#sinks | |
 | E4 | ast-grep triage executed | audit/triage.md exists with >0 entries. All WRITE/LEAK entries have corresponding read-log rows | |
 | E5 | Sink aggregator files Read | All AUTH_AGGREGATOR and DB_AGGREGATOR files from triage.md have corresponding read-log entries | |
+| E6 | Module deep-read sample gate | Group entries by `controller_group`; for each group with >= 3 endpoints, at least 1 endpoint must be deep-read in read-log (not shallow-only). | |
 
 ---
 
 ## Hard Gate (Phase 2.5 → Phase 3)
 
-**D1 (Injection), D2 (Authentication), D3 (Authorization) MUST ALL be ✅.**
+**D1 (Injection), D2 (Authentication), D3 (Authorization), D11 (Info Disclosure), D12 (Data Exposure) MUST ALL be ✅.**
 **E1 (Public endpoints Read), E2 (Auth endpoints Read) MUST ALL be ✅.**
 **E4 (ast-grep triage verified) MUST be ✅ if ast-grep is available.**
 **E5 (Sink aggregator files Read) MUST be ✅.**
+**E6 (Module deep-read sample gate) MUST be ✅.**
 
 If any hard-gate check is not ✅ → trigger R2 before Phase 3. Non-negotiable.
 
@@ -82,8 +84,8 @@ After the hard gate passes, answer these three questions:
 ## R2 Trigger Conditions
 
 R2 is triggered when:
-- **D1, D2, or D3** is not ✅ (mandatory)
-- **E1, E2, E4, or E5** is not ✅ (mandatory)
+- **D1, D2, D3, D11, or D12** is not ✅ (mandatory)
+- **E1, E2, E4, E5, or E6** is not ✅ (mandatory)
 - **2 or more** of D4-D12 are ❌ (recommended)
 - **Q1, Q2, or Q3** = YES (convergence failure)
 

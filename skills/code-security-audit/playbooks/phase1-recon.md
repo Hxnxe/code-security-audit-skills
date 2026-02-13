@@ -234,8 +234,11 @@ The master agent validates:
 
 Merge all outputs into `audit/map.json`:
 - `tech_stack`: language, framework, middleware, ORM, auth mechanism
-- `entries`: all HTTP entry points with route, method, handler, auth status, trust level (🔴/🟡/⚪), `permission_annotation`, `resource_type`, `ownership_check`, `controller_group`
+- `entries`: all HTTP entry points with route, method, handler, auth status, trust level (🔴/🟡/⚪), `permission_annotation`, `resource_type`, `ownership_check`, `controller_group`, `has_write`, `needs_field_audit`
 - `entries` normalization: `resource_type` uses `user-owned` / `org-scoped` / `global` / `implicit`; `controller_group` groups CRUD endpoints in the same controller/router.
+- `entries` shallow flags:
+  - `has_write`: static flag from method/pattern scan (`.update/.create/.destroy/.delete/.save/.upsert`)
+  - `needs_field_audit`: static flag for public endpoint likely returning model/include/list data; this is a Phase 2 deep-read trigger, not a final data-exposure verdict
 - `sinks`: all dangerous sinks with type, file, line, function
 - `configs`: security-relevant configurations and secrets
 - `models`: data models with ownership relationships
@@ -355,10 +358,21 @@ When ALL Phase 1 steps are done, output a **Phase 1 Summary** (max 20 lines):
 ## Phase 1 Summary
 - Tech stack: [language] + [framework] + [ORM] + [auth mechanism]
 - Total endpoints: N (public: X, authenticated: Y, admin: Z)
+- Manifest coverage: entries=N / route_files=M (coverage=K%)
 - Triage hits: N files tagged (WRITE: A, LEAK: B, SQL: C, AGGREGATOR: D)
 - Hypotheses: H1 [one-line], H2 [one-line], H3 [one-line]
 - Key risk areas: [2-3 sentence summary]
 ```
+
+**Manifest Coverage Check (HARD GATE):**
+1. Compute `route_file_count` via Phase 1 Step 1 route glob patterns.
+2. Compute `entry_count` as `map.json#entries.length`.
+3. Compute `coverage = entry_count / route_file_count`.
+4. If `coverage < 0.95`:
+   - List missing route files not represented in entries
+   - Re-run Step 1 mapping or manually supplement missing entries
+   - STOP: do not enter Phase 2 until coverage >= 0.95
+5. Record the final coverage value in the Phase 1 Summary.
 
 Then proceed to Phase 2. All detailed data is in audit/ files — do NOT carry Phase 1 conversation details forward mentally.
 

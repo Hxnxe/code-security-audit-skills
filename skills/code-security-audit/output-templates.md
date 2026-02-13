@@ -208,6 +208,21 @@ Each finding follows this exact template:
   - 漏洞态: ...
   - 修复态: ...
 
+## 攻击链复现（按杀伤力排序）
+
+### AC-001 [攻击链名称]
+- **起点**: 未认证 / 已认证低权限
+- **终点**: 管理员接管 / 资金盗取 / 数据泄露 / RCE
+- **杀伤力**: Critical / High
+
+| 步骤 | 漏洞编号 | 操作 | 获得能力 |
+|------|---------|------|---------|
+| 1 | BLOG-001 | `curl GET {{BASE_URL}}/api/...` | 获取管理员邮箱 |
+| 2 | CRIT-002 | `curl GET {{BASE_URL}}/api/...` | 重置管理员密码 |
+| 3 | - | `curl POST {{BASE_URL}}/api/auth/login ...` | 获取管理员会话 |
+
+- **断点修复**: 修复 [漏洞编号] 即可阻断整条链路
+
 ## 修复优先级（按攻击链断点）
 1. ...
 
@@ -216,3 +231,10 @@ Each finding follows this exact template:
 - `{{ACCESS_TOKEN}}`：普通用户 Token
 - `{{ADMIN_TOKEN}}`：管理员 Token
 ```
+
+**Output integrity rule (MANDATORY):**
+- If the report claims `N` findings, it MUST list all `N` findings explicitly.
+- Forbidden placeholders:
+  - `[Additional findings documented with similar structure]`
+  - `...等 X 条中危漏洞`
+  - any "similar/as above" wording replacing concrete finding content
