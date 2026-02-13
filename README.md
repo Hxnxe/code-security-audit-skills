@@ -3,6 +3,9 @@
 ## 概览
 该仓库包含 `code-security-audit` 审计流程的 **skills** 与 **droids**。核心目标是以 Q1–Q7 语义审计为中心，完成 Phase 1–4 的端到端安全评估，并默认输出全中文、复现导向报告。
 
+## 完整文档
+- 项目完整介绍：`PROJECT-INTRODUCTION.zh-CN.md`
+
 ## 目录结构
 - `skills/`：主流程与 playbooks
 - `droids/`：Phase 2/3 子代理
@@ -141,4 +144,3 @@ flowchart LR
 
 ## 说明
 完整规则与模板请查看 `skills/code-security-audit` 下的 playbooks 与模板文件。
-
