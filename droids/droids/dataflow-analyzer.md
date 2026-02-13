@@ -107,7 +107,17 @@ For each trace:
 ### Sanitization Barriers: None | [barrier + why insufficient]
 ### Cross-Validation: reverse ✅/❌ | forward ✅/❌
 ### Confidence: high | medium | low
+
+### Missing Prerequisites
+- type: `user_info|credentials|session|config|timing|access_token`
+- description: [what is still needed to exploit]
+- required_for: [which exploit step needs this]
+- search_hint: [targeted search instruction]
+- resolved: true|false
+- resolved_by: [finding_id or null]
 ```
+
+Also append/update each prerequisite row in `audit/prereq-candidates.md` using the same schema.
 
 ## Constraints
 - Only trace P0/P1 items from risk-map.md

@@ -90,6 +90,14 @@ flowchart LR
 - **业务心智模型**：输出 `audit/business-model.md`（行为签名 + 敏感数据清单）
 - **触发器分级**：L1/L2 必报、L3 聚合采样、L4 统计绑定基线
 - **语义复核**：Step 0.5 由 master 复核 ALERT 队列，Q3/Q7 对比基线
+- **LSP 优先导航（Phase 3）**：dataflow/access/validate 三个 Phase 3 droid 优先使用 `go-to-definition` / `find-references` / call hierarchy 精确追链，确保跨函数/跨模块调用关系可靠；LSP 不可用或未安装时，才回退 `rg` 文本检索
+
+**LSP 使用约束（Phase 3）**：
+- 仅在 Phase 3 深度验证阶段启用（Phase 1/2 仍保持文本/结构检索为主）
+- 推荐服务器：
+  - TypeScript/JavaScript：`npx typescript-language-server --stdio`
+  - Python：`basedpyright-langserver --stdio`（或 `pyright-langserver --stdio`）
+- 若 LSP 缺失，按提示征求安装许可，失败或拒绝才使用 `rg` 兜底
 
 ## 使用方式
 1. 将 `skills/` 与 `droids/` 放入 Factory 对应目录
@@ -98,3 +106,4 @@ flowchart LR
 
 ## 说明
 完整规则与模板请查看 `skills/code-security-audit` 下的 playbooks 与模板文件。
+

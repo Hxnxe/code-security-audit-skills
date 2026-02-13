@@ -6,6 +6,7 @@
 - `audit/risk-map.md` for P0/P1 ranked findings to verify
 - `audit/map.json` for context (entries, sinks, models)
 - `audit/hypotheses.md` for attack chain construction
+- `audit/attack-chains-draft.md` for Phase 3 verification prioritization
 
 This phase starts from files, not from memory.
 
@@ -13,9 +14,10 @@ This phase starts from files, not from memory.
 
 Before executing Phase 3, verify:
 
-1. Phase 2.5 hard gate passed: D1/D2/D3 = ✅, E1/E2/E4/E5 = ✅
+1. Phase 2.5 hard gate passed: D1/D2/D3/D11/D12 = ✅, E1/E2/E4/E5/E6 = ✅
 2. Phase 2.5 convergence check passed: Q1/Q2/Q3 all = NO (or R2 completed)
 3. `audit/risk-map.md` exists with P0/P1 ranked entries
+4. `audit/attack-chains-draft.md` exists (can be empty only if no P0/P1 findings)
 
 **If ANY check fails → STOP. Return to Phase 2.5.**
 
@@ -34,6 +36,17 @@ Before executing Phase 3, verify:
 
 **All 4 pass** → Confirmed vulnerability, record in `audit/findings.md` with full call chain.
 **Any step fails** → Downgrade to "needs manual review" or exclude.
+
+---
+
+## Step 0: Attack-Chain Guided Prioritization
+
+Read `audit/attack-chains-draft.md` and prioritize validation order:
+1. Findings on chain front segments (`ENTRY` / `STEPPING_STONE`) first
+2. Findings tied to unresolved prerequisites (`resolved=false`) next
+3. Remaining P0/P1 findings by risk-map rank
+
+Pass this ordering to all Step 1 verification Droids.
 
 ---
 
@@ -62,7 +75,7 @@ Invoke these Droid subagents via the Task tool during Phase 3:
 
 ## Phase 4: Report Generation (20% effort)
 
-Read `~/.factory/skills/code-security-audit/output-templates.md` for format specifications. Generate `audit/report.md` in **全中文 + 渗透复现导向**格式，并确保：
+Read `output-templates.md` for format specifications. Generate `audit/report.md` in **全中文 + 渗透复现导向**格式，并确保：
 - **Critical / High** 漏洞必须包含 PoC（使用 `audit/pocs.md`）
 - 报告结构包含：项目概览、复现总览表、关键漏洞复现指南、修复优先级、占位符说明
 

@@ -6,6 +6,7 @@
 - `audit/map.json` for entries, sinks, configs, models
 - `audit/triage.md` for high-risk file shortlist
 - `audit/hypotheses.md` for attack hypothesis priorities
+- `audit/prereq-candidates.md` (if exists) for unresolved prerequisite tracking
 
 This phase starts from files, not from memory.
 
@@ -19,6 +20,9 @@ Before executing Phase 2, verify these artifacts exist:
 4. `audit/read-log.md` exists and contains > 0 entries
 
 **If ANY check fails → STOP. Return to Phase 1 and complete missing steps.**
+
+Initialization rule:
+- Ensure `audit/prereq-candidates.md` exists at Phase 2 start (create an empty file with header if missing), so downstream gates are deterministic even when no P0/P1 is found.
 
 ---
 
@@ -64,6 +68,20 @@ Batch-write all Step 0 reads to `audit/read-log.md` after Step 0 completes.
 **Why master agent?** This step requires semantic reasoning (Q5: "is this mutation authorized?", Q7: "does the code match its name?"). Pattern-matching Droids cannot do this.
 
 **Parallelization**: Step 0 (master reads endpoints) and Step 1+2 (scanner dispatch) can run in parallel. Scanners depend on map.json, NOT on public-endpoint-review.md. Launch scanners immediately after the direction decision — do not wait for Step 0 to complete.
+
+**Real-time Prerequisite Tracking (MANDATORY):**
+Whenever Step 0 or Step 0.5 produces any P0/P1 finding, master agent MUST immediately:
+1. Append a prerequisite row to `audit/prereq-candidates.md` using this schema:
+   - `finding_id`
+   - `type` (`user_info` | `credentials` | `session` | `config` | `timing` | `access_token`)
+   - `description`
+   - `required_for`
+   - `search_hint`
+   - `resolved` (`true/false`)
+   - `resolved_by` (finding_id or null)
+2. Run targeted search immediately using `search_hint` across the full `api_root` (not only current module).
+3. If matched, Read matched files and evaluate chain linkage now (do not defer to Phase 3).
+4. If unresolved, keep `resolved=false` for Phase 3 follow-up.
 
 ---
 
@@ -121,6 +139,10 @@ Each Droid works independently with read-only access.
    - **Verdict**: Assign P0/P1/P2 severity + brief justification, OR dismiss as false positive with reason
 4. **Review STATS L3 samples**: Read the 5 suggested sample endpoints from each scanner's L3 section. Apply Q1/Q3/Q5 (shallow check). If any reveals a problem → escalate to ALERT.
 5. **Review STATS L4**: Cross-reference with business-model.md sensitive data inventory. If "N public endpoints touch settings table" is non-zero and settings contains secrets → escalate affected endpoints to ALERT.
+6. **False-negative spot-check (MANDATORY)**:
+   - For each scanner's key "no-issue" claim, sample at least 3 endpoints/files marked clean.
+   - Use an independent strategy (master `rg`/`ast-grep`) for scanner-specific patterns.
+   - If any contradiction is found, invalidate that scanner's corresponding "no-issue" conclusions and re-run or master-takeover that dimension.
 
 **Output**: Reviewed findings ready for Step 3 merge. Each has master-assigned severity.
 
@@ -156,3 +178,18 @@ Combine Step 0 findings + Step 0.5 reviewed ALERTs into `audit/risk-map.md` — 
 - `high`: Full source-to-sink path confirmed with minimal gaps
 
 **Output**: `audit/risk-map.md` with chain metadata for every entry
+
+---
+
+## Step 3.5: Draft Attack Chain Synthesis (Phase 2)
+
+Invoke `security-analyst` once at the end of Phase 2 to produce draft chains for Phase 3 prioritization.
+
+**Input set (Phase 2 draft mode)**:
+- `audit/map.json`
+- `audit/risk-map.md`
+- `audit/hypotheses.md`
+- `audit/prereq-candidates.md`
+
+**Output**:
+- `audit/attack-chains-draft.md` (draft prerequisite graph + draft attack chains)
