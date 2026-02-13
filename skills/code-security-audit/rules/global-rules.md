@@ -5,6 +5,7 @@
 2. No false positives over missed bugs — only report code you READ.
 3. Questions over patterns — use the 7 universal questions.
 4. Decision over search — optimize where to look, how deep, when to stop.
+5. Anti-confirmation-bias — do not down-rank or skip any dimension based on prior expectations; coverage must be evidence-driven.
 
 ## Output Protocol
 - Anti-repetition: if the same status line appears >2 times, collapse and proceed.

@@ -80,12 +80,7 @@ ast-grep -p 'exec(`$$$`)' --lang ts --json
    ```
    Derive route path from file path. `[param]` = dynamic segment, `(group)` = invisible group.
 
-   **Batch metadata extraction** (do NOT Read each file individually):
-   ```bash
-   # One command extracts auth status for ALL route files
-   rg "requiresAuth" --type ts -n {api_root} --json
-   ```
-   Parse the JSON output to classify each file. Only Read individual files if `requiresAuth` is ambiguous or missing from rg output.
+   **Metadata extraction**: Use `rg "requiresAuth" --type ts -n {api_root}` or directly Read route files to classify auth status. No specific extraction method is mandated — choose the most efficient approach for the project's routing style.
 
 3. **Explicit routing** (Express/Flask/Spring/Gin):
    grep for route registrations AND Glob for `routes/`, `controllers/`, `api/`, `views/` directories.
@@ -239,7 +234,8 @@ The master agent validates:
 
 Merge all outputs into `audit/map.json`:
 - `tech_stack`: language, framework, middleware, ORM, auth mechanism
-- `entries`: all HTTP entry points with route, method, handler, auth status, trust level (🔴/🟡/⚪)
+- `entries`: all HTTP entry points with route, method, handler, auth status, trust level (🔴/🟡/⚪), `permission_annotation`, `resource_type`, `ownership_check`, `controller_group`
+- `entries` normalization: `resource_type` uses `user-owned` / `org-scoped` / `global` / `implicit`; `controller_group` groups CRUD endpoints in the same controller/router.
 - `sinks`: all dangerous sinks with type, file, line, function
 - `configs`: security-relevant configurations and secrets
 - `models`: data models with ownership relationships
