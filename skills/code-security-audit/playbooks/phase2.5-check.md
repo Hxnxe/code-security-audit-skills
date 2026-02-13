@@ -31,10 +31,11 @@ Execute this self-check after Phase 2 scanning completes. For each dimension, as
 | D11 | Info Disclosure | Do public endpoints expose PII, configs, secrets, or internal state? | |
 | D12 | Data Exposure | Do non-admin endpoint responses include unnecessary sensitive fields (over-serialization)? | |
 
-**Status Definitions:**
-- ✅ **Covered**: Code has been READ and dataflow TRACED for this dimension
-- ⚠️ **Shallow**: Only grep-searched, not deep-dived into actual code logic
-- ❌ **Not Covered**: Dimension was not examined at all
+**Status Definitions (Track-Specific):**
+- ✅ **Covered (sink-driven dimensions: D1, D2, D4-D8, D10-D12)**: representative sinks were READ, fan-out to sibling callsites/modules was performed, and dataflow or control guards were verified.
+- ✅ **Covered (control-driven dimensions: D3, D9)**: endpoint traversal completed by `controller_group`, CRUD consistency comparison completed, and permission/ownership/state-transition checks were verified for each group.
+- ⚠️ **Shallow**: only grep/pattern evidence exists, or only single-point validation without required fan-out/control comparison.
+- ❌ **Not Covered**: dimension was not examined at all.
 
 ---
 
@@ -90,12 +91,13 @@ R2 is triggered when:
 
 ## R2 Execution Constraints
 
-When R2 launches, carry these three lists from R1:
+When R2 launches, carry these four lists from R1:
 
 ```
 1. Covered dimensions list      → R2 skips these entirely
 2. Uncovered dimensions list    → R2 only creates Agents for these
 3. Analyzed files list          → R2 does not re-read these files
+4. CLEAN surfaces list          → R2 does not re-scan these attack surfaces unless new contradictory evidence appears
 ```
 
 **R2 Agent allocation**:

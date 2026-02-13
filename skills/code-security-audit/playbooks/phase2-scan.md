@@ -77,6 +77,10 @@ Read `audit/map.json`, then apply this decision logic:
 | `entries` have endpoints without auth, `models` lack ownership fields, or `configs` show weak token config | **`access-scanner`** (D2+D3) | All endpoints authed, all models have ownership, token config solid |
 | `sinks` contains deserialization/ssrf/file_operation, or `configs` show hardcoded secrets/debug mode | **`infra-scanner`** (D4-D10) | No infra-related sinks or config issues |
 
+Track declaration:
+- D1 / D4-D8 / D10-D12 default to sink-driven + dataflow validation.
+- D3 and D9 must run control-driven first (endpoint traversal + CRUD consistency comparison by `controller_group`), then confirm sinks.
+
 **Output a brief decision log before invoking**:
 ```
 Phase 2 Direction Decision:
