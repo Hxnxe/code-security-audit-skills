@@ -1,146 +1,230 @@
 # Code Security Audit Skills
 
-## 概览
-该仓库包含 `code-security-audit` 审计流程的 **skills** 与 **droids**。核心目标是以 Q1–Q7 语义审计为中心，完成 Phase 1–4 的端到端安全评估，并默认输出全中文、复现导向报告。
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-## 完整文档
-- 项目完整介绍：`PROJECT-INTRODUCTION.zh-CN.md`
+**English** | [中文文档](PROJECT-INTRODUCTION.zh-CN.md)
 
-## 目录结构
-- `skills/`：主流程与 playbooks
-- `droids/`：Phase 2/3 子代理
+A structured, phase-gated AI-powered code security audit framework designed for Web applications. Unlike single-pass scanners, this system implements a rigorous 4-phase workflow with hard gates, artifact contracts, and role-based agent coordination.
 
-**子目录说明**：
-- `skills/code-security-audit/playbooks/`：Phase 1–4 的执行规程与门槛
-- `skills/code-security-audit/output-templates.md`：最终报告与复现模板
-- `droids/`：扫描器（Phase 2）与验证器（Phase 3）
+## Why This Project?
 
-## 流程概述
-1. **Phase 1**：建图与 triage（含 Phase 1.8 业务心智模型）
-2. **Phase 2**：并行扫描（ALERT + STATS 两级输出）
-3. **Phase 2.5**：收敛检查
-4. **Phase 3**：深度验证与证据固化
-5. **Phase 4**：中文复现报告（Critical/High 必含 PoC）
+Common AI security tools suffer from:
+- No convergence checks → unmanageable false positives/negatives
+- No phase gates → unstable, skip-prone workflows
+- No artifact contracts → scattered results, poor collaboration
+- Reports not reproduction-ready → hard to action
 
-## 流程图（Flowchart）
-```mermaid
-flowchart TD
-  P1[Phase 1 Recon & Map] --> P2[Phase 2 Parallel Scan]
-  P2 --> P25[Phase 2.5 Convergence]
-  P25 --> P3[Phase 3 Verification]
-  P3 --> P4[Phase 4 Report]
+**This framework solves these with:**
+- 4-phase hard-gated workflow (Phase 1→2→2.5→3→4)
+- Unified `audit/` artifact contract for all phases
+- Scanner (candidate) / Validator (deep verify) separation
+- Attack-chain priority verification
+- Reproduction-ready Chinese reports with PoCs
 
-  subgraph Master[Master Agent]
-    M1[入口枚举 + triage] --> M18[业务心智模型 business-model.md]
-    M2[Step 0 深读 Q1-Q7] --> M05[Step 0.5 复核 ALERT]
-    M4[报告生成 report.md]
-  end
+## Quick Start
 
-  subgraph Scanners[Phase 2 Scanners]
-    A[access-scanner] --> AL[ALERT + STATS]
-    I[injection-scanner] --> IL[ALERT + STATS]
-    F[infra-scanner] --> FL[ALERT + STATS]
-  end
+### Installation
 
-  P1 --> M1
-  M1 --> M18
-  P2 --> M2
-  P2 --> Scanners
-  AL --> M05
-  IL --> M05
-  FL --> M05
-  M05 --> P25
-  P3 --> M4
+#### Codex (Project-level)
+```bash
+# Place skills in project directory
+mkdir -p .codex/skills
+cp -r skills/code-security-audit .codex/skills/
 ```
 
-## 产物流转图（Artifacts Flow）
-```mermaid
-flowchart LR
-  subgraph Phase1[Phase 1 Outputs]
-    map[map.json]
-    triage[triage.md]
-    hypo[hypotheses.md]
-    readlog[read-log.md]
-    bm[business-model.md]
-  end
-
-  subgraph Phase2[Phase 2 Outputs]
-    review[public-endpoint-review.md]
-    risk[risk-map.md]
-    prereq[prereq-candidates.md]
-    chains[attack-chains-draft.md]
-  end
-
-  subgraph Phase3[Phase 3 Outputs]
-    dataflow[dataflow.md]
-    findings[findings.md]
-    consolidated[findings-consolidated.md]
-    pocs[pocs.md]
-  end
-
-  subgraph Phase4[Phase 4 Output]
-    report[report.md]
-  end
-
-  map --> review
-  triage --> review
-  hypo --> review
-  bm --> review
-  readlog --> review
-  review --> risk
-  risk --> prereq
-  risk --> chains
-  risk --> dataflow
-  risk --> findings
-  dataflow --> consolidated
-  findings --> consolidated
-  consolidated --> report
-  pocs --> report
+#### OpenCode
+```bash
+mkdir -p .opencode/skills
+cp -r unified-skills/opencode .opencode/skills/code-security-audit
 ```
 
-## 关键特性
-- **业务心智模型**：输出 `audit/business-model.md`（行为签名 + 敏感数据清单）
-- **触发器分级**：L1/L2 必报、L3 聚合采样、L4 统计绑定基线
-- **语义复核**：Step 0.5 由 master 复核 ALERT 队列，Q3/Q7 对比基线
-- **LSP 优先导航（Phase 3）**：dataflow/access/validate 三个 Phase 3 droid 优先使用 `go-to-definition` / `find-references` / call hierarchy 精确追链，确保跨函数/跨模块调用关系可靠；LSP 不可用或未安装时，才回退 `rg` 文本检索
+### Usage
+```
+Use skill code-security-audit to run the full workflow 
+(Phase 1->2->2.5->3->4) on repository [target-repo]
+```
 
-**门槛与完整性（核心新增）**：
-- **Manifest Coverage Gate（Phase 1）**：`entries/route_files >= 0.95`，低于阈值禁止进入 Phase 2
-- **Coverage Hard Gate（Phase 2.5）**：D1/D2/D3/D11/D12 必须 ✅，并新增 E6「模块深读抽样」门槛
-- **Attack-Chain Draft（Phase 2.5 前置）**：Phase 2 产出 `attack-chains-draft.md`，Phase 3 按链路优先级验证
-- **输出完整性规则**：报告宣称 `N` 个发现必须逐条列出，禁止“同类省略”占位
+## Supported Languages & Frameworks
 
-**Prerequisite 追踪（Phase 2/3）**：
-- 发现 P0/P1 时即时记录 `prereq-candidates.md`
-- Phase 3 优先验证未满足前置条件的链路段（`resolved=false`）
+| Language | Frameworks |
+|----------|-----------|
+| Python | Flask, Django, FastAPI, Tornado |
+| Java | Spring Boot, Struts, Servlet |
+| Go | Gin, Echo, net/http |
+| PHP | Laravel, ThinkPHP |
+| Node.js | Express, Koa, Fastify, Nitro/Nuxt, Next.js, SvelteKit, Remix |
 
-**LSP 使用约束（Phase 3）**：
-- 仅在 Phase 3 深度验证阶段启用（Phase 1/2 仍保持文本/结构检索为主）
-- 推荐服务器：
-  - TypeScript/JavaScript：`npx typescript-language-server --stdio`
-  - Python：`basedpyright-langserver --stdio`（或 `pyright-langserver --stdio`）
-- 若 LSP 缺失，按提示征求安装许可，失败或拒绝才使用 `rg` 兜底
+## Workflow Overview
 
-## 使用方式
-1. 将 `skills/` 与 `droids/` 放入 Factory 对应目录
-2. 调用 `code-security-audit` skill
-3. 输出位于 `audit/`
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Phase 1: Recon & Map Building                              │
+│  - Entry point enumeration (Glob is truth, grep is hint)    │
+│  - Sink/Model/Config discovery                              │
+│  - Attack hypothesis generation                             │
+│  - Business mental model construction                       │
+│  Gate: Manifest Coverage >= 95%                             │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Phase 2: Parallel Candidate Scan                           │
+│  - 6 scanners run in parallel (injection/access/infra...)   │
+│  - ALERT + STATS output (no final severity)                 │
+│  - Master agent semantic review                             │
+│  - Attack-chain draft generation                            │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Phase 2.5: Coverage & Convergence Gate                     │
+│  - D1/D2/D3/D11/D12 must be ✅ (hard gate)                  │
+│  - E1/E2/E4/E5/E6 must be ✅ (hard gate)                    │
+│  - If failed → R2 remediation loop                          │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Phase 3: Deep Verification                                 │
+│  - Dataflow tracing (entry → transform → sink)              │
+│  - Four-step verification per finding                       │
+│  - PoC generation for Critical/High                         │
+│  - Finding consolidation & deduplication                    │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Phase 4: Report Generation                                 │
+│  - Full Chinese reproduction-oriented report                │
+│  - Attack chain walkthrough (AC-001, AC-002...)             │
+│  - PoC for all Critical/High findings                       │
+│  - Priority-ordered remediation guide                       │
+└─────────────────────────────────────────────────────────────┘
+```
 
-## 关键产物清单（按阶段）
-### Phase 1
-- `map.json`（entries/sinks/models/configs + 控制字段）
-- `triage.md`、`hypotheses.md`、`read-log.md`、`business-model.md`
+## Audit Dimensions (D1-D12)
 
-### Phase 2
-- `public-endpoint-review.md`、`risk-map.md`
-- `prereq-candidates.md`（前置条件追踪）
-- `attack-chains-draft.md`（链路草案）
+| Dimension | Focus Area |
+|-----------|-----------|
+| D1 | Injection (SQL, Command, LDAP, SSTI) |
+| D2 | Broken Authentication |
+| D3 | Sensitive Data Exposure |
+| D4 | XML External Entities |
+| D5 | Broken Access Control |
+| D6 | Security Misconfiguration |
+| D7 | Cross-Site Scripting (XSS) |
+| D8 | Insecure Deserialization |
+| D9 | Using Components with Known Vulnerabilities |
+| D10 | Insufficient Logging & Monitoring |
+| D11 | SSRF (Server-Side Request Forgery) |
+| D12 | Crypto & Secrets Management |
 
-### Phase 3
-- `dataflow.md`、`findings.md`、`findings-consolidated.md`
+## Universal Questions (Q1-Q7)
 
-### Phase 4
-- `report.md`（全中文渗透复现报告）
+Every endpoint is evaluated against these semantic questions:
 
-## 说明
-完整规则与模板请查看 `skills/code-security-audit` 下的 playbooks 与模板文件。
+| Question | Purpose |
+|----------|---------|
+| Q1 | Does the endpoint perform untrusted input handling? |
+| Q2 | Are there authentication/authorization bypass risks? |
+| Q3 | Does the response contain sensitive data leakage? |
+| Q4 | Are there unsafe deserialization or file operations? |
+| Q5 | Does the endpoint have unintended write operations? |
+| Q6 | Are there race conditions or TOCTOU vulnerabilities? |
+| Q7 | Does the code behavior match business expectations? |
+
+## Directory Structure
+
+```
+code-security-audit-skills/
+├── skills/
+│   └── code-security-audit/
+│       ├── playbooks/          # Phase 1-4 execution guides
+│       ├── rules/              # Global rules, scope, constraints
+│       └── output-templates.md # Report & finding templates
+├── droids/
+│   └── droids/                 # Agent role definitions
+│       ├── injection-scanner.md
+│       ├── access-scanner.md
+│       ├── dataflow-analyzer.md
+│       └── ...
+├── unified-skills/             # Cross-runtime packages
+│   ├── codex/                  # Codex runtime
+│   ├── opencode/               # OpenCode runtime
+│   ├── droid/                  # Direct prompt mode
+│   ├── shared/                 # Shared gates & contracts
+│   └── templates/              # Subtask templates
+└── PROJECT-INTRODUCTION.zh-CN.md
+```
+
+## Output Artifacts
+
+All outputs are written to `audit/` directory:
+
+| Phase | Artifacts |
+|-------|-----------|
+| 1 | `map.json`, `triage.md`, `hypotheses.md`, `read-log.md`, `business-model.md` |
+| 2 | `public-endpoint-review.md`, `risk-map.md`, `prereq-candidates.md`, `attack-chains-draft.md` |
+| 3 | `dataflow.md`, `findings.md`, `findings-consolidated.md`, `pocs.md` |
+| 4 | `report.md` (Chinese, reproduction-oriented) |
+
+## Key Features
+
+### Hard Gates
+- Manifest Coverage Gate: `entries/route_files >= 95%`
+- Phase 2.5 Gate: D1/D2/D3/D11/D12 + E1/E2/E4/E5/E6 must pass
+- No phase skipping allowed
+
+### Artifact Contract
+- All phases read/write to `audit/` directory
+- Structured JSON for automation
+- Human-readable markdown for review
+
+### Scanner/Validator Separation
+- Phase 2 scanners: candidate discovery only (ALERT/STATS)
+- Phase 3 validators: deep verification with evidence
+- Master agent: final severity assignment
+
+### Attack-Chain Priority
+- Phase 2 generates attack chain drafts
+- Phase 3 verifies by chain priority
+- Report includes full chain walkthrough
+
+## Comparison with Alternatives
+
+| Feature | This Framework | Typical AI Scanner |
+|---------|---------------|-------------------|
+| Phase gates | Hard gates | Single pass |
+| Artifact contract | Structured `audit/` | Chat output |
+| Role separation | Scanner ≠ Validator | Single agent |
+| Report quality | Reproduction-ready | Explanatory only |
+| Attack chains | Full chain analysis | Isolated findings |
+
+## Requirements
+
+- Read access to target codebase
+- Write access to `audit/` directory
+- Text search capability (e.g., `ripgrep`)
+- (Optional) LSP for precise code navigation in Phase 3
+
+## Limitations
+
+- Does not replace dynamic penetration testing
+- Does not replace manual business logic review
+- Requires platform support for skill registration
+
+## Roadmap
+
+- More runtime adapters
+- Language/framework-specific policy packs
+- CI/CD integration for PR/diff auditing
+- Auto-generated patch suggestions
+
+## License
+
+MIT License - see LICENSE for details.
+
+---
+
+**Core Value**: This project is not "yet another scanner" — it's about **productizing AI security audit workflows**: executable, verifiable, reviewable, deliverable, and reproducible.
