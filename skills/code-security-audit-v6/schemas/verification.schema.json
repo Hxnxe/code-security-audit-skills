@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "code-security-audit/verification.schema.json",
+  "title": "verification-document",
+  "description": "verification.md MUST contain verification summary section and V-XXX entries with required labels.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "verification_entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/verification_entry" }
+    }
+  },
+  "$defs": {
+    "verification_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entry_id",
+        "source",
+        "file",
+        "data_flow_trace",
+        "verification_conclusion",
+        "evidence"
+      ],
+      "properties": {
+        "entry_id": {
+          "type": "string",
+          "pattern": "^V-[A-Za-z0-9_-]+$",
+          "description": "Verification entry ID in format V-XXX"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Which scanner's alert (access-scanner, injection-scanner, infra-scanner)"
+        },
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_./\\-\\[\\]()]+\\.[A-Za-z0-9_]+:[0-9]+$",
+          "description": "File:line reference"
+        },
+        "data_flow_trace": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Data flow from entry point to sink"
+        },
+        "verification_conclusion": {
+          "type": "string",
+          "enum": ["CONFIRMED", "DISPUTED", "NEEDS_DEEPER"],
+          "description": "Verification result"
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Specific code references and evidence"
+        }
+      }
+    }
+  }
+}

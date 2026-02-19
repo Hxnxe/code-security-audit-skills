@@ -1,0 +1,227 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "code-security-audit/verdict.schema.json",
+  "title": "verdict-document",
+  "description": "verdict.json MUST be a single JSON object with top-level field \"verdicts\".",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdicts"],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "verdicts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/verdict_record" }
+    }
+  },
+  "$defs": {
+    "verdict_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "finding_id",
+        "validity_verdict",
+        "severity_action",
+        "disproof_attempts",
+        "independent_code_refs"
+      ],
+      "properties": {
+        "schema_version": { "type": "integer", "const": 1 },
+        "finding_id": { "type": "string", "minLength": 1 },
+        "validity_verdict": {
+          "type": "string",
+          "enum": ["CONFIRMED", "DISPUTED", "NEEDS_CONTEXT"]
+        },
+        "severity_action": {
+          "type": "string",
+          "enum": ["UNCHANGED", "DOWNGRADED", "UPGRADED"]
+        },
+        "severity_adjusted": {
+          "type": "string",
+          "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
+        },
+        "severity_reason": { "type": "string", "minLength": 1 },
+        "disproof_attempts": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["strategy", "what_was_checked", "evidence_citations", "result"],
+            "properties": {
+              "strategy": {
+                "type": "string",
+                "enum": [
+                  "AUTHZ_GUARD_EXISTS",
+                  "SANITIZER_PRESENT",
+                  "UNREACHABLE_SINK",
+                  "SAFE_API_USED",
+                  "PRECONDITION_IMPOSSIBLE",
+                  "FRAMEWORK_PROTECTION",
+                  "RATE_LIMIT_PRESENT"
+                ]
+              },
+              "what_was_checked": { "type": "string", "minLength": 1 },
+              "evidence_citations": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["tool", "file", "line_start", "line_end"],
+                  "properties": {
+                    "tool": { "type": "string", "enum": ["LSP", "AST_GREP", "RG", "GLOB", "READ", "BASH"] },
+                    "file": { "type": "string", "minLength": 1 },
+                    "line_start": { "type": "integer", "minimum": 1 },
+                    "line_end": { "type": "integer", "minimum": 1 },
+                    "symbol": { "type": "string" }
+                  }
+                }
+              },
+              "result": {
+                "type": "string",
+                "enum": ["FAILED_TO_DISPROVE", "DISPROVED", "INCONCLUSIVE"]
+              }
+            }
+          }
+        },
+        "refuting_code_path": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["steps"],
+          "properties": {
+            "steps": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["file", "function", "line_range", "description"],
+                "properties": {
+                  "file": { "type": "string", "minLength": 1 },
+                  "function": { "type": "string", "minLength": 1 },
+                  "line_range": {
+                    "type": "array",
+                    "items": { "type": "integer", "minimum": 1 },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  "description": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        },
+        "confirmation_basis": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["failed_strategies"],
+          "properties": {
+            "failed_strategies": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["strategy", "why_failed", "checked_locations"],
+                "properties": {
+                  "strategy": {
+                    "type": "string",
+                    "enum": [
+                      "AUTHZ_GUARD_EXISTS",
+                      "SANITIZER_PRESENT",
+                      "UNREACHABLE_SINK",
+                      "SAFE_API_USED",
+                      "PRECONDITION_IMPOSSIBLE",
+                      "FRAMEWORK_PROTECTION",
+                      "RATE_LIMIT_PRESENT"
+                    ]
+                  },
+                  "why_failed": { "type": "string", "minLength": 1 },
+                  "checked_locations": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": { "type": "string", "minLength": 1 }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "independent_code_refs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["tool", "file", "line_start", "line_end"],
+            "properties": {
+              "tool": { "type": "string", "enum": ["LSP", "AST_GREP", "RG", "GLOB", "READ", "BASH"] },
+              "file": { "type": "string", "minLength": 1 },
+              "line_start": { "type": "integer", "minimum": 1 },
+              "line_end": { "type": "integer", "minimum": 1 },
+              "note": { "type": "string" }
+            }
+          }
+        },
+        "investigation_refs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "loop_feedback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["spawned_patterns"],
+          "properties": {
+            "spawned_patterns": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            },
+            "rescan_required": { "type": "boolean" }
+          }
+        },
+        "needs_context_detail": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "severity_action": { "enum": ["DOWNGRADED", "UPGRADED"] } },
+            "required": ["severity_action"]
+          },
+          "then": {
+            "required": ["severity_adjusted", "severity_reason"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "validity_verdict": { "const": "DISPUTED" } },
+            "required": ["validity_verdict"]
+          },
+          "then": {
+            "required": ["refuting_code_path"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "validity_verdict": { "const": "CONFIRMED" } },
+            "required": ["validity_verdict"]
+          },
+          "then": {
+            "required": ["confirmation_basis"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "validity_verdict": { "const": "NEEDS_CONTEXT" } },
+            "required": ["validity_verdict"]
+          },
+          "then": {
+            "required": ["needs_context_detail"]
+          }
+        }
+      ]
+    }
+  }
+}
