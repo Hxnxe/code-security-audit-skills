@@ -1,0 +1,13 @@
+id: SEMANTIC_CONTRADICTION
+category: AUTH_LOGIC_WEAKNESS
+strength: HIGH
+engine: RG
+reason: Endpoint declares permission but lacks requiresAuth, making permission check unreachable.
+requires_deep_read: true
+include_globs:
+  - '*.ts'
+  - '*.js'
+  - '*.java'
+patterns:
+  - "permission\\s*:\\s*['\\\"]"
+  - 'requiresAuth\s*:\s*false'
