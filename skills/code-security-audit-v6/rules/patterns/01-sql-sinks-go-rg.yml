@@ -1,0 +1,13 @@
+id: SQL_SINKS_GO_RG
+category: SINK_RAW_QUERY
+strength: HIGH
+engine: RG
+reason: User controlled input reaching raw SQL APIs is a primary exploit path.
+requires_deep_read: true
+include_globs:
+  - '*.go'
+patterns:
+  - 'DB\.Exec\('
+  - 'DB\.Query\('
+  - 'db\.Exec\('
+  - 'db\.Query\('

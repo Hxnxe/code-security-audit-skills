@@ -1,0 +1,14 @@
+id: SQL_SINKS_RG
+category: SINK_RAW_QUERY
+strength: HIGH
+engine: RG
+reason: User controlled input reaching raw SQL APIs is a primary exploit path.
+requires_deep_read: true
+include_globs:
+  - '*.ts'
+  - '*.js'
+  - '*.java'
+patterns:
+  - 'Sequelize\.literal\('
+  - '\.(query|queryRaw|\$queryRaw)\('
+  - 'createQueryBuilder\('

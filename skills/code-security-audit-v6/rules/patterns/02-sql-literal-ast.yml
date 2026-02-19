@@ -1,0 +1,10 @@
+id: SQL_LITERAL_TEMPLATE_AST
+category: SINK_SQL_LITERAL
+strength: HIGH
+engine: AST_GREP
+lang: ts
+reason: Template-literal SQL construction frequently indicates tainted sink risk.
+requires_deep_read: true
+patterns:
+  - 'Sequelize.literal(`$$$`)'
+  - '$OBJ.query(`$$$`)'
