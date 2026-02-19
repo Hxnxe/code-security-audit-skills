@@ -1,0 +1,13 @@
+id: CMD_EXEC_SINK
+category: SINK_CMD_EXEC
+strength: HIGH
+engine: RG
+reason: Command execution primitives can turn dataflow bugs into RCE.
+requires_deep_read: true
+include_globs:
+  - '*.ts'
+  - '*.js'
+  - '*.py'
+  - '*.java'
+patterns:
+  - '(exec\(|spawn\(|system\(|popen\(|subprocess\.)'

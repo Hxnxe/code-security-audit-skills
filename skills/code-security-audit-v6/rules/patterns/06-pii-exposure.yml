@@ -1,0 +1,13 @@
+id: PII_EXPOSURE_PATTERN
+category: PII_EXPOSURE_PATTERN
+strength: MEDIUM
+engine: RG
+reason: PII in public responses is a common high-impact disclosure vector.
+requires_deep_read: true
+include_globs:
+  - '*.ts'
+  - '*.js'
+  - '*.java'
+patterns:
+  - '(email|phone|password|token|secret|private_key|mnemonic)'
+  - 'include\s*:'
