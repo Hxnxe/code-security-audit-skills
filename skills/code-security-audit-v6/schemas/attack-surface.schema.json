@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "code-security-audit/attack-surface.schema.json",
+  "title": "attack-surface-record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "signal_id",
+    "category",
+    "signal_strength",
+    "source",
+    "file",
+    "line",
+    "pattern",
+    "excerpt",
+    "requires_deep_read",
+    "reason"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "signal_id": { "type": "string", "minLength": 1 },
+    "category": {
+      "type": "string",
+      "enum": [
+        "SINK_SQL_LITERAL",
+        "SINK_RAW_QUERY",
+        "SINK_CMD_EXEC",
+        "PUBLIC_WRITE",
+        "AUTH_ENDPOINT",
+        "AUTH_LOGIC_WEAKNESS",
+        "PII_EXPOSURE_PATTERN",
+        "CONFIG_EXPOSURE",
+        "SECRET_IN_NON_RUNTIME",
+        "CHAIN_SEED",
+        "OTHER"
+      ]
+    },
+    "signal_strength": { "type": "string", "enum": ["HIGH", "MEDIUM", "LOW"] },
+    "source": { "type": "string", "enum": ["RG", "AST_GREP", "INVENTORY", "MANUAL"] },
+    "file": { "type": "string", "minLength": 1 },
+    "line": { "type": "integer", "minimum": 1 },
+    "method": {
+      "type": "string",
+      "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
+    },
+    "route": { "type": "string", "minLength": 1 },
+    "pattern": { "type": "string", "minLength": 1 },
+    "excerpt": { "type": "string", "minLength": 1 },
+    "symbol": { "type": "string", "minLength": 1 },
+    "linked_endpoint_key": { "type": "string", "minLength": 1 },
+    "requires_deep_read": { "type": "boolean" },
+    "reason": { "type": "string", "minLength": 1 },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  }
+}

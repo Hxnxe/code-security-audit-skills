@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "code-security-audit/inventory.schema.json",
+  "title": "inventory-record",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "file",
+    "language",
+    "likely_endpoint",
+    "stratum",
+    "risk_score"
+  ],
+  "properties": {
+    "file": { "type": "string", "minLength": 1 },
+    "language": { "type": "string", "minLength": 1 },
+    "likely_endpoint": { "type": "boolean" },
+    "stratum": {
+      "type": "string",
+      "enum": ["S1", "S2", "S3", "S4", "S5", "S6", "S7"]
+    },
+    "risk_score": { "type": "integer", "minimum": 0 },
+    "lines": { "type": "integer", "minimum": 0 },
+    "module": { "type": "string", "minLength": 1 },
+    "sink_hits": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "flags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  }
+}

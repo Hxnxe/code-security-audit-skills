@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "code-security-audit/finding.schema.json",
+  "title": "finding-record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "type",
+    "file",
+    "line",
+    "exploitability",
+    "severity",
+    "preconditions",
+    "impact",
+    "poc",
+    "remediation",
+    "chain_refs",
+    "anomaly_refs",
+    "discovered_from_signal_ids",
+    "evidence_bundle",
+    "confidence"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "hypothesis_id": { "type": "string", "minLength": 1 },
+    "type": { "type": "string", "minLength": 1 },
+    "file": { "type": "string", "minLength": 1 },
+    "line": { "type": "integer", "minimum": 1 },
+    "source": { "type": "string", "minLength": 1 },
+    "sink": { "type": "string", "minLength": 1 },
+    "dataflow": { "type": "string", "minLength": 1 },
+    "exploitability": {
+      "type": "string",
+      "enum": ["PROVEN", "LIKELY", "THEORETICAL"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
+    },
+    "preconditions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "impact": { "type": "string", "minLength": 1 },
+    "poc": { "type": "string", "minLength": 1 },
+    "remediation": { "type": "string", "minLength": 1 },
+    "chain_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "anomaly_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "discovered_from_signal_ids": {
+      "type": "array",
+      "minItems": 0,
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "evidence_bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary_refs"],
+      "properties": {
+        "primary_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["tool", "file", "line_start", "line_end"],
+            "properties": {
+              "tool": { "type": "string", "enum": ["LSP", "AST_GREP", "RG", "GLOB", "READ", "BASH"] },
+              "file": { "type": "string", "minLength": 1 },
+              "line_start": { "type": "integer", "minimum": 1 },
+              "line_end": { "type": "integer", "minimum": 1 },
+              "symbol": { "type": "string" },
+              "note": { "type": "string" }
+            }
+          }
+        },
+        "commands": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "taint_summary": { "type": "string", "minLength": 1 },
+        "auth_context": { "type": "string", "minLength": 1 }
+      }
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "attacker_narrative": { "type": "string", "minLength": 1 }
+  }
+}
