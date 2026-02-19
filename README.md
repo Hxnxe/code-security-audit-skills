@@ -5,7 +5,12 @@
 
 **English** | [中文文档](PROJECT-INTRODUCTION.zh-CN.md)
 
-A structured, phase-gated AI-powered code security audit framework designed for Web applications. Unlike single-pass scanners, this system implements a rigorous 4-phase workflow with hard gates, artifact contracts, and role-based agent coordination.
+A structured, phase-gated AI-powered code security audit framework designed for Web applications. Unlike single-pass scanners, this system implements rigorous, artifact-driven workflows with hard gates and role-based agent coordination.
+
+## Versions
+
+- **V6 (current)**: `skills/code-security-audit-v6/` — 3-phase RECON → AUDIT → HARDEN, machine-validated artifacts, mandatory master verification, and judge-driven verdicts.
+- **Legacy**: `skills/code-security-audit/` — earlier 4-phase workflow retained for backward compatibility.
 
 ## Why This Project?
 
@@ -30,19 +35,19 @@ Common AI security tools suffer from:
 ```bash
 # Place skills in project directory
 mkdir -p .codex/skills
-cp -r skills/code-security-audit .codex/skills/
+cp -r skills/code-security-audit-v6 .codex/skills/
 ```
 
 #### OpenCode
 ```bash
 mkdir -p .opencode/skills
-cp -r unified-skills/opencode .opencode/skills/code-security-audit
+cp -r skills/code-security-audit-v6 .opencode/skills/code-security-audit-v6
 ```
 
 ### Usage
 ```
-Use skill code-security-audit to run the full workflow 
-(Phase 1->2->2.5->3->4) on repository [target-repo]
+Use skill code-security-audit-v6 to run the full workflow
+(RECON -> AUDIT -> HARDEN) on repository [target-repo]
 ```
 
 ## Supported Languages & Frameworks
@@ -139,10 +144,12 @@ Every endpoint is evaluated against these semantic questions:
 ```
 code-security-audit-skills/
 ├── skills/
-│   └── code-security-audit/
-│       ├── playbooks/          # Phase 1-4 execution guides
-│       ├── rules/              # Global rules, scope, constraints
-│       └── output-templates.md # Report & finding templates
+│   ├── code-security-audit/       # Legacy workflow
+│   └── code-security-audit-v6/    # Current workflow
+│       ├── scripts/               # RECON/AUDIT/HARDEN pipeline scripts
+│       ├── rules/                 # Global rules, scope, constraints
+│       ├── prompts/               # LLM prompts for each phase
+│       └── droids/                # Scanner/chain subagents
 ├── droids/
 │   └── droids/                 # Agent role definitions
 │       ├── injection-scanner.md
