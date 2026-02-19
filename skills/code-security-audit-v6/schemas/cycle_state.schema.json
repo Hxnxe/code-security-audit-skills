@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "code-security-audit/cycle-state.schema.json",
+  "title": "cycle-state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "updated_at",
+    "phase",
+    "iteration",
+    "max_iterations",
+    "project_root",
+    "api_root",
+    "audit_dir"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "updated_at": { "type": "string", "minLength": 1 },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "INIT",
+        "RECON_DONE",
+        "AUDIT_PENDING",
+        "HARDEN_RUNNING",
+        "R2_REQUIRED",
+        "JUDGE_REQUIRED",
+        "DONE",
+        "FAILED"
+      ]
+    },
+    "iteration": { "type": "integer", "minimum": 1 },
+    "max_iterations": { "type": "integer", "minimum": 1 },
+    "project_root": { "type": "string", "minLength": 1 },
+    "api_root": { "type": "string", "minLength": 1 },
+    "audit_dir": { "type": "string", "minLength": 1 },
+    "last_status": { "type": "string" },
+    "note": { "type": "string" },
+    "r2_required": { "type": "boolean" }
+  }
+}

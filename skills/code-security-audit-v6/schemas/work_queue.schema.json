@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "code-security-audit/work_queue.schema.json",
+  "title": "work-queue",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generated_at", "queue"],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "generated_at": { "type": "string", "minLength": 1 },
+    "queue": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "reason", "phase"],
+        "properties": {
+          "target": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 },
+          "phase": { "type": "string", "enum": ["AUDIT", "HARDEN", "R2"] },
+          "priority": { "type": "string", "enum": ["P0", "P1", "P2"] }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "code-security-audit/coverage.schema.json",
+  "title": "coverage-record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "iteration",
+    "thresholds",
+    "metrics",
+    "content_gate_passed",
+    "r2_required",
+    "r2_reasons",
+    "next_targets",
+    "summary"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "generated_at": { "type": "string", "minLength": 1 },
+    "iteration": { "type": "integer", "minimum": 1 },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["critical_surface_min", "endpoint_audit_min"],
+      "properties": {
+        "critical_surface_min": { "type": "number", "minimum": 0, "maximum": 1 },
+        "endpoint_audit_min": { "type": "number", "minimum": 0, "maximum": 1 },
+        "known_vuln_recall_min": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtime_endpoint_coverage_ratio",
+        "non_runtime_asset_coverage_ratio",
+        "endpoint_audit_coverage_ratio",
+        "critical_surface_coverage_ratio",
+        "findings_with_evidence_ratio"
+      ],
+      "properties": {
+        "runtime_endpoint_coverage_ratio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "non_runtime_asset_coverage_ratio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "endpoint_audit_coverage_ratio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "critical_surface_coverage_ratio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "findings_with_evidence_ratio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "known_vuln_recall_ratio": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "content_gate_passed": { "type": "boolean" },
+    "r2_required": { "type": "boolean" },
+    "r2_reasons": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "next_targets": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "summary": { "type": "string", "minLength": 1 },
+    "delta": {
+      "type": "object",
+      "additionalProperties": { "type": "number" }
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "improved_metrics": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "regressed_metrics": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "roi_recommendations": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}
