@@ -1,0 +1,15 @@
+id: PUBLIC_WRITE_PATH
+category: PUBLIC_WRITE
+strength: HIGH
+engine: RG
+reason: Public write operations are high-risk chain entry points.
+requires_deep_read: true
+include_globs:
+  - '*.ts'
+  - '*.js'
+  - '*.java'
+patterns:
+  - 'requiresAuth\s*:\s*false'
+  - 'auth_required\s*:\s*false'
+  - '@Public\b'
+  - '\.(update|create|upsert|destroy|delete|save)\('

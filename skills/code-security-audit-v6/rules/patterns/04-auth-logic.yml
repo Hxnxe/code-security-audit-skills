@@ -1,0 +1,16 @@
+id: AUTH_LOGIC_WEAK
+category: AUTH_LOGIC_WEAKNESS
+strength: HIGH
+engine: RG
+reason: Auth flow defects are often logic bugs not caught by endpoint-level checks.
+requires_deep_read: true
+include_globs:
+  - '*.ts'
+  - '*.js'
+  - '*.java'
+patterns:
+  - '(login|register|reset|verify|signup|callback)\s*\('
+  - '(upsert|update)\(.*password'
+  - '(oldPassword|currentPassword|previousPassword)'
+  - 'hashPassword\s*\(.*req\.'
+  - 'createSession.*\buser\b'

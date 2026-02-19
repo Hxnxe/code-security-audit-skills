@@ -1,0 +1,13 @@
+id: CONFIG_EXPOSURE_PATTERN
+category: CONFIG_EXPOSURE
+strength: MEDIUM
+engine: RG
+reason: Config and settings responses can leak secrets or internal state.
+requires_deep_read: true
+include_globs:
+  - '*.ts'
+  - '*.js'
+  - '*.java'
+patterns:
+  - '(getSettings|getConfig|settings)'
+  - '(process\.env|cache\.get|runtimeConfig)'
